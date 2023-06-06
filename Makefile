@@ -1,26 +1,25 @@
-all:CSR2_SPMV CSR_SPMV check
+all:CSR2_SPMV CSR_SPMV check CSR2_C CSR2_S CSR2_C_MP
 
-.PHONY : CSR2_SPMV CSR_SPMV check
-#compilers(g++ or icc)
+.PHONY : CSR2_SPMV CSR_SPMV CSR2_C_MP check
 
-CC=icc
-#CC = g++
+CC = g++
 
 #g++
-#CSR2_SPMV:
-#	$(CC) -march=native -fopenmp -O -o CSR2_SPMV CSR2_SPMV.cpp
-#CSR_SPMV:
-#	$(CC) -march=native -fopenmp -O -o CSR_SPMV CSR_SPMV.cpp
-#check:
-#	$(CC) -march=native -fopenmp -O -o check check.cpp
-
-#icc
-CSR2_SPMV:
-	$(CC) -xCORE-AVX2 -fopenmp -ftz -IPF_fltacc -IPF_fma -O2 -o CSR2_SPMV CSR2_SPMV.cpp
 CSR_SPMV:
-	$(CC) -xCORE-AVX2 -ftz -IPF_fltacc -IPF_fma -qopt-prefetch=3 -qopenmp -O -o CSR_SPMV CSR_SPMV.cpp
-check:
-	$(CC) -xCORE-AVX2 -qopt-prefetch=3 -qopenmp -O -o check check.cpp
+	$(CC) -march=native -fopenmp -o CSR_SPMV CSR_SPMV.cpp
+CSR2_C:
+	$(CC) -march=native -o CSR2_C CSR2_C.cpp 
+CSR2_C_ASM:
+	$(CC) -march=native  -o CSR2_C_ASM CSR2_C_ASM.cpp 
 
-.PHONY:clean
-	rm CSR2_SPMV CSR_SPMV check
+CSR2_C_MP:
+	$(CC) -march=native -fopenmp -o CSR2_C_MP CSR2_C_MP.cpp 
+CSR2_S:
+	$(CC) -march=native -g  -o CSR2_S CSR2_S.cpp my256dmul.S my256dadd.S my256dload.S my256dfmadd.S
+
+check:
+	$(CC) -march=native -fopenmp  -o check check.cpp
+
+clean:
+	rm CSR_SPMV check CSR2_C CSR2_S CSR2_C_MP
+

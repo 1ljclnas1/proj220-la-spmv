@@ -1,8 +1,11 @@
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
+#include <time.h>
+#include <sys/time.h>
 #define INT int
 #define DOU double
+#define P 1000
 int main(int argc,char ** argv)
 {
         FILE * fp_mtx;
@@ -16,15 +19,22 @@ int main(int argc,char ** argv)
         DOU  * mtx_ans;
         char * filename_mtx;
         char * filename_vec;
+	char * Iterations;
         if(argc>=2)
         {
                 filename_mtx = argv[1];
                 filename_vec = argv[2];
+		Iterations = argv[3];
         }
         else
         {
                 printf("error! please input right filename\n");
         }
+	INT ite = 0;
+	for(INT i=0;i<strlen(Iterations);i++)
+	{
+		ite = ite * 10 + Iterations[i]-'0';
+	}
         fp_mtx = fopen(filename_mtx,"rb+");
         fp_vec = fopen(filename_vec,"rb+");
         fp_ans = fopen("answer_serial.mtx","wb+");
@@ -71,6 +81,10 @@ int main(int argc,char ** argv)
         }
         row_ptr[row_num]=cnt;
         fprintf(fp_ans,"%d\n",row_num);
+	struct timeval start,end;
+	double timeuse;
+	gettimeofday(&start,NULL);
+	for(int p=0;p<ite;p++){
         for(INT i=0;i<row_num;i++)
         {
                 mtx_ans[i]=0;
@@ -80,5 +94,9 @@ int main(int argc,char ** argv)
                 }
                 fprintf(fp_ans,"%.6lf\n",mtx_ans[i]);
         }
+	}
+	gettimeofday(&end,NULL);
+        timeuse = end.tv_sec - start.tv_sec + (end.tv_usec - start.tv_usec)/1000000.0;
+        printf("CSR COMPUTE Time : %.6lf ms\n",timeuse*1000/ite);
         return 0;
 }
